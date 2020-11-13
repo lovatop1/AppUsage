@@ -1,5 +1,6 @@
 package com.example.appusage;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.AppOpsManager;
@@ -8,6 +9,7 @@ import android.app.usage.UsageStatsManager;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -27,8 +29,10 @@ import static android.os.Process.myUid;
 
 public class MainActivity extends AppCompatActivity {
 
-    private ProgressBar progressBar;
+    //private ProgressBar progressBar;
     private TextView permissionMessage;
+    String grant_permission_message = "ACCESO CONCEDIDO";
+    Context context;
 
 
     @Override
@@ -36,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        permissionMessage = (TextView) findViewById(R.id.grant_permission_message);
+        permissionMessage = (TextView) findViewById(R.id.center);
 
         permissionMessage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -45,12 +49,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        if (checkForPermission()) {
-            MainActivity app1 = new MainActivity();
-            app1.getInstalledApps();
-            app1.getStats();
-        } else {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            if (checkForPermission(null)) {
+                MainActivity app1 = new MainActivity();
+                app1.getInstalledApps();
+                app1.getStats();
+            } else {
 
+            }
         }
     }
 
@@ -134,6 +140,7 @@ public class MainActivity extends AppCompatActivity {
         return installedApps;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.Q)
     private boolean checkForPermission(Context context) {
         AppOpsManager appOps = (AppOpsManager) context.getSystemService(Context.APP_OPS_SERVICE);
         int mode = appOps.unsafeCheckOp (OPSTR_GET_USAGE_STATS, myUid(), context.getPackageName());
